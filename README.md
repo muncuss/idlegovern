@@ -1,2 +1,2 @@
 # idlegovern
-Idle governing game
+simple text based governing game in js
