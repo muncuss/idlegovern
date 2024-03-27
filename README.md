@@ -1,0 +1,2 @@
+# idlegovern
+Idle governing game
