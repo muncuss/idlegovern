@@ -3,13 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <title>Judul halaman</title>
+    <script type="text/javascript" src="civilian.js"></script>
     <script type="text/javascript" src="main.js"></script>
 </head>
-<body onload="run()">
-    <p id="show"></p>
+<body id="body" onload="run()">
+    
+    
+    <section>
+    <!-- VARIABLE -->
     <p>Date: <span id="date"></span></p>
     <p>Population: <span id="pop"></span></p>
+    <p>Coin: <span id="coin"></span></p>
     <p>Wheat: <span id="wheat"></span></p>
+    <p>Goods: <span id="goods"></span></p>
+    <p>Material: <span id="material"></span></p>
+    </section>
+    <br/>
+    <br/>
+    
+    
+    <section>
+    <!-- TAB -->
+    <input type="button" value="Economy" onclick="switchTab('economy')">
+    <input type="button" value="Troop" onclick="switchTab('troop')">
+    </section>
+    <br/>
+    <br/>
+    
+    
+    <section id="economy">
+    <!-- ECONOMY -->
+<!--    <p>Tax rate: <span id="taxrate"></span>%</p>
+    <label for="changeTaxRate">Change Tax Rate</label>
+    <br/>
+    <input type="number" id="changeTaxInput" placeholder="0">
+    <input type="button" id="buttonv" value="change" onclick="changeTaxInput()"> 
+    <br/>
+    <br/>
+    <label for="sellGoods">Sell Goods</label>
+    <br/>
+    <input type="number" id="sellGoodsInput" placeholder="0">
+    <input type="button" id="buttonv" value="sell" onclick="sellGoodsInput()">
+    <br/>
+    <label for="buyGoods">Buy Goods</label>
+    <br/>
+    <input type="number" id="buyGoodsInput" placeholder="0">
+    <input type="button" id="buttonx" value="buy" onclick="buyGoodsInput()">
+    <br/>
+    <br/> -->
+    <p><span>Market</span></p>
+    <label for="buyAmount">Buy</label>
+    <br/>
+    <input type="number" id="buyAmount" placeholder="0">
+    <select>
+        <option id="bwheat">Wheat</option>
+        <option id="bgoods">Goods</option>
+        <option id="bmaterial">Material</option>
+    </select>
+    <button onclick="buyInput()">Buy</button>
+    <br/>
+    <br/>
+    <label for="sellAmount">Sell</label>
+    <br/>
+    <input type="number" id="sellAmount" placeholder="0">
+    <select>
+        <option id="swheat">Wheat</option>
+        <option id="sgoods">Goods</option>
+        <option id="smaterial">Material</option>
+    </select>
+    <button onclick="sellInput()">Sell</button>
+    </section>
+    <br/>
+    <br/>
+    
+    
+    
+    <section id="troop">
+    <!-- TROOP & ENEMY -->
+    <p>Monster lair: <span id="monsterLair"></span></p>
+    <p>Troops</p>
+    <ul>
+        <li>Idle: <span id="idleTroop"></span></li>
+        <li>In mission: <span id="inMission"></span></li>
+    </ul>
+    <label for="inputTroopRecruit">Recruit Troop</label>
+    <br/>
+    <input type="number" id="inputTroopRecruit" placeholder="0">
+    <input type="button" id="buttonz" value="recruit" onclick="troopRecruitInput()">
+    <br/>
+    <br/>
+    <label for="assignForMission">Assign for mission</label>
+    <br/>
+    <input type="number" id="assignForMission" placeholder="0">
+    <input type="button" id="buttonw" value="assign" onclick="troopAssignInput()">
+    <br/>
+    <br/>
+    <label for="inputTroopDismiss">Dismiss Troop</label>
+    <br/>
+    <input type="number" id="inputTroopDismiss" placeholder="0">
+    <input type="button" id="buttony" value="dismiss" onclick="troopDismissInput()">
+    </section>
+    <br/>
+    <br/>
+    
+    
+    <section>
+    <!-- NOTIFICATION -->
+        <p><span id="notiff"></span></p>
+    </section>
+    
 </body>
 </html>
         
