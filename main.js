@@ -12,37 +12,28 @@ var birthd = 0
 var birthRate = 0.002
 var death = 0
 var deathRate = 0.015 //for famine or something
-//var wheatPop = 5000
-//var goodsPop = 0
-//var farmer = 0.5 // % of total pop
-//var artisan = 0.1 // %
-//var gatherer = 0.2
-//var laborer = 0.2
 //var land = 1062 // 80% is farmer, divide by household (avg 6 people in household)
 var harvestRate = 77 /* medieval data*/
 var fertileRate = 1
 var produceRate = 4 //per month
 var gatherRate = 9
 var consumRate = 1.04 /* medieval data per month */
-
-var arrLord = ["lord", 0, 50000, 600, 10, 0, 0, 0]
-var arrFarmer = ["farmer", 0.5, 800, 5000, 10, 0, 0, 3]
+var happiness = 5
+//["name", population percentage, coin, wheat, goods, material, debt, tax rate]
+var arrLord = ["lord", 0, 12000, 600, 10, 0, 0, 0]
+var arrFarmer = ["farmer", 0.5, 800, 8000, 10, 0, 0, 3]
 var arrArtisan = ["artisan", 0.2, 1500, 1000, 100, 40, 0, 3]
-var arrGatherer = ["gatherer", 0.2, 500, 1000, 10, 80, 0, 3]
-var arrMerchant = ["merchant", 0.1, 15000, 2000, 20, 20, 0, 0]
+var arrGatherer = ["gatherer", 0.2, 1500, 1000, 10, 80, 0, 3]
+var arrMerchant = ["merchant", 0.1, 40000, 2000, 20, 20, 0, 0]
 //var priceOg = [5.8, 80, 23] //
 var priceOg = [5.8, 24, 8]
 var buyFactor = 0.95
 var sellFactor = 1.05
 var capMerchant = [1000, 1000, 1000]
 var invMerchant = [1000,50,50]
-var trdSupply = [1000,50,50]
+var trdSupply = [0,0,0]
 var trdDemand = [0,0,0]
 
-//var taxRate = 5 //in %
-//var wheatLord = 600
-//var goodsLord = 10
-//var coinLord = 30000
 var troopAmount = 0
 var troopWage = 60 //2 pence per day medieval data
 var troopConsumeRate = 0.034 //per day bushel
@@ -65,6 +56,7 @@ var currentTab = "troop"
 /* SYSTEM FUNCTION */
 function timer() {
     day++;
+    lost()
     if(day > 30) {
         month++
         day = 1
@@ -114,6 +106,9 @@ function monthly() {
     merchantBuy(arrFarmer)
     merchantBuy(arrArtisan)
     merchantBuy(arrGatherer)
+    supplyDemand(trdSupply, trdDemand)
+//    dynamicPrice()
+    console.log(priceOg)
     arrFarmer = payDebt(arrFarmer)
     arrArtisan = payDebt(arrArtisan)
     arrGatherer = payDebt(arrGatherer)
@@ -141,282 +136,12 @@ function runOnce(func) {
 
 
 
-/* LORD */
-function harvestTax() {
-    let x
-    x = Math.floor(arrFarmer[3] * (arrFarmer[7] / 100))
-    arrFarmer[3] -= x
-    arrLord[3] += x
-    notif(`This year harvest tax is ${x} bushels`)
-}
-
-function produceTax() {
-    let x
-    x = Math.floor(arrArtisan[4] * (arrArtisan[7] / 100))
-    arrArtisan[4] -= x
-    arrLord[4] += x
-    notif(`Production tax from the artisans is ${x} goods in various forms`)
-}
-
-function gatherTax() {
-    let x
-    x = Math.floor(arrGatherer[5] * (arrGatherer[7] / 100))
-    arrGatherer[5] -= x
-    arrLord[5] += x
-    notif(`Tax from the gatherer is ${x} material`)
-}
-
-function sellWheatLord(input) {
-    let cost = input * Math.floor(priceOg[0] * buyFactor)
-    if(input > arrLord[3]) {
-        notif("Not enough wheat in warehouse!")
-    }else if(input < 0){
-        notif("You can't do that'")
-    }else if(arrMerchant[2] < cost){
-        notif(`The merchant doesn't have enough coin to buy ${input} wheat`)
-    }else {
-        arrLord = sellWheat(input, arrLord)
-        notif(`You sold ${input} wheat for ${cost} coins`)
-    }
-}
-
-function sellGoodsLord(input) {
-    let cost = input * Math.floor(priceOg[1] * buyFactor)
-    if(input > arrLord[4]) {
-        notif("Not enough goods in warehouse!")
-    }else if(input < 0){
-        notif("You can't do that'")
-    }else if(arrMerchant[2] < cost){
-        notif(`The merchant doesn't have enough coin to buy ${input} goods`)
-    }else {
-        arrLord = sellGoods(input, arrLord)
-        notif(`You sold ${input} goods for ${cost} coins`)
-    }
-}
-
-function sellMaterialLord(input) {
-    let cost = input * Math.floor(priceOg[2] * buyFactor)
-    if(input > arrLord[5]) {
-        notif("Not enough material in warehouse!")
-    }else if(input < 0){
-        notif("You can't do that'")
-    }else if(arrMerchant[2] < cost){
-        notif(`The merchant doesn't have enough coin to buy ${input} material`)
-    }else {
-        arrLord = sellMaterial(input, arrLord)
-        notif(`You sold ${input} materials for ${cost} coins`)
-    }
-}
-
-function buyWheatLord(input) {
-    let cost = input * Math.floor(priceOg[0] * sellFactor)
-    if(input > invMerchant[0]) {
-        notif("The market doesn't have enough wheat")
-    }else if(input < 0){
-        notif("You can't do that'")
-    }else if(arrLord[2] < cost){
-        notif("You don't have enough coin M'lord")
-    }else {
-        arrLord = buyWheat(input, arrLord)
-        notif(`You bought ${input} wheat for ${cost} coins from local market`)
-    }
-}
-
-function buyGoodsLord(input) {
-    let cost = input * Math.floor(priceOg[1] * sellFactor)
-    if(input > invMerchant[1]) {
-        notif("The market doesn't have enough goods")
-    }else if(input < 0){
-        notif("You can't do that'")
-    }else if(arrLord[2] < cost){
-        notif("You don't have enough coin M'lord")
-    }else {
-        arrLord = buyGoods(input, arrLord)
-        notif(`You bought ${input} goods for ${cost} coins from local market`)
-    }
-}
-
-function buyMaterialLord(input) {
-    let cost = input * Math.floor(priceOg[2] * sellFactor)
-    if(input > invMerchant[2]) {
-        notif("The market doesn't have enough material")
-    }else if(input < 0){
-        notif("You can't do that'")
-    }else if(arrLord[2] < cost){
-        notif("You don't have enough coin M'lord")
-    }else {
-        arrLord = buyMaterial(input, arrLord)
-        notif(`You bought ${input} materials for ${cost} coins from local market`)
-    }
-}
-
-function changeTax(input,x) {
-    if(input > 30) { //max tax rate 30%
-        notif("Tax rate too high!")
-    }else if(input < 0){
-        notif("Are you serious?")
-    }else{
-        x[7] = input
-        notif(`Changed tax rate to ${input}`)
-    }
-}
-
-
-
-
-
-/* ENEMY */
-function monsterBreed() {
-    let w
-    w = monsterAmount * monsterBirthRate
-    monsterAmount += Math.floor(w)
-}
-
-function monsterRaid() {
-    let k = randomInt(0, 4)
-    let pack = randomInt(5, 10)
-    if(k == 1) {
-        notif("Monster raided our village!")
-        let ts = troopAmount * troopStrength
-        let ms = pack * monsterStrength
-        let result = ts - ms
-        if(result < 0) {
-        //troop total strength is weaker
-            let resultpos = Math.abs(result)
-            let tloss = Math.floor(resultpos / troopStrength)
-            if(ts <= 0 && pop > tloss) {
-            //no troop
-                pop -= tloss
-                notif(`${tloss} people was killed by the monster! Maybe you should have recruited some troops`)
-            }else {
-                notif(`Casualty from previous monster attack is ${tloss} people, from both soldier and civilian`)
-                let diff = Math.abs(tloss - troopAmount)            
-                if(tloss > troopAmount && pop > diff) {
-                    troopAmount -= tloss - diff
-                    pop -= diff
-                }else if(tloss < troopAmount && pop > diff){
-                    troopAmount -= tloss
-                }else if(tloss > troopAmount && pop < diff){
-                    pop = 0
-                    lost()
-                }else {
-                    lost()
-                }
-            }
-        }else {
-            notif(`Rejoice! your troops succesfully defended the town from monster raid!`)
-            let mloss = result / ms
-            monsterAmount -= Math.floor(mloss)
-        }
-    }
-}
-
-function destroyLair(troopx) {
-    let ts = troopx * troopStrength
-    let ms = (monsterAmount/monsterLair)*monsterStrength
-    let result = ts - ms
-    if(result < 0) {
-        notif("The expedition failed! Unfortunately, your entire troop in the mission is killed")
-        troopMission = 0
-    }else {
-        notif("The expedition succeeded! one lair is destroyed")
-        monsterLair -= 1
-        monsterAmount -= monsterAmount/monsterLair
-        let killed = result / troopStrength
-        troopAmount += troopMission - Math.floor(killed)
-    }
-}
-
-
-
-
-
-/* TROOP */
-function troopWagef() {
-    let tu
-    let payBack
-    
-    tu = (troopAmount+troopMission) * troopWage
-    payBack = Math.floor(tu / 3)
-    if(tu > arrLord[2]) {
-        notif("Not enough coin to pay your troops! some of them leave the barack")
-        let o = tu - arrLord[2]
-        let p = o / troopWage
-        troopAmount -= Math.floor(p)
-        arrLord[2] -= Math.floor((troopAmount+troopMission)*troopWage)
-    }else if(troopAmount > 0) {
-        arrLord[2] -= tu
-        arrFarmer[2] += payBack
-        arrArtisan[2] += payBack
-        arrGatherer[2] += payBack
-        notif(`Troops wage for this month is ${tu} coins`)
-    }
-}
-
-function troopEat() {
-    let tu
-    
-    tu = Math.ceil(troopAmount * troopConsumeRate)
-    if(arrLord[2] < tu) {
-        notif("There is not enough wheat in the warehouse to feed the troops. Your troops resort to hunting and foraging")
-        arrLord[3] += forage(tu)
-        arrLord[3] -= tu
-    }else if(troopAmount > 0) {
-        arrLord[3] -= tu
-        notif(`${tu} bushel of wheat has been used to feed the troops`)
-    }
-}
-
-function troopAssign(x) {
-    let time = (randomInt(10,20) * 1000)
-    let wheat = Math.ceil((x * troopConsumeRate) * (time / 1000))
-    
-    if(arrLord[3] > wheat && x > 0) {
-        troopAmount -= x
-        troopMission = x
-        arrLord[3] -= wheat
-        notif(`You have assigned ${x} troops in a mission to destroy monster lair`)
-        setTimeout(destroyLair, time, x)
-    }else {
-        notif("You don't have enough wheat to supply the troops in mission!")
-    }
-}
-
-/*function calcStrength() {
-    
-}*/
-
-function troopRecruit(input) {
-    if(input > pop) {
-        notif("Not enough population!")
-    }else if(arrLord[4] < input * 2) {
-        notif("Not enough armor and weapon for the new recruit!")
-    }else if(input > 0){
-        let g = input * 2
-        arrLord[4] -= g
-        troopAmount += input
-        pop -= input
-        notif(`You have recruited ${input} new troop, costing ${g} goods for the weapon and armor`)
-    }
-}
-
-function troopDismiss(input) {
-    if(input > troopAmount && input > 0) {
-        notif("No one to be dissmissed!")
-    }else {
-        troopAmount -= input
-        pop += input
-    }
-}
-
-
-
-
-
 /* MISC */
 function lost() {
-    notif("YOU LOST!")
-    clearInterval(inter1)
+    if(pop <= 0) {
+        notif("YOU LOST!")
+        clearInterval(inter1)
+    }
 }
 
 
