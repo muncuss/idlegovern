@@ -63,21 +63,29 @@ function harvestEvent() {
 function produce() {
     let total
     let reqMat = Math.floor(popAmount(arrArtisan[1]) * 3)
-    let remain = invMerchant[5] - reqMat
+    let remain = invMerchant[2] - reqMat
     total = popAmount(arrArtisan[1]) * produceRate
     
     if(arrArtisan[4] > 2000) {
         arrArtisan[4] += 0
     }else if(arrArtisan[5] < reqMat) {
-    //if not enough material
-        if(invMerchant[5] < reqMat && arrArtisan[6] < (popAmount(arrArtisan[1])*10)) {
+        //if not enough material
+        if(invMerchant[2] < reqMat && arrArtisan[6] < (popAmount(arrArtisan[1])*10)) {
         //if merchant not enough material
             arrArtisan = buyMaterial((reqMat - remain), arrArtisan)
             arrArtisan[5] += forage((reqMat - remain))
-        }else if(invMerchant[5] > reqMat &&  arrArtisan[6] < (popAmount(arrArtisan[1])*10)) {
+            arrArtisan[5] -= reqMat
+            arrArtisan[4] += total
+        }else if(invMerchant[2] > reqMat &&  arrArtisan[6] < (popAmount(arrArtisan[1])*10)) {
             arrArtisan = buyMaterial(reqMat, arrArtisan)
-        }else {
-            arrArtisan[4] += 0
+            arrArtisan[5] -= reqMat
+            arrArtisan[4] += total
+        }else if(invMerchant[2] < reqMat &&  arrArtisan[6] > (popAmount(arrArtisan[1])*10)) {
+            arrArtisan[5] -= 0
+            arrArtisan[4] += Math.floor(total / 2)
+        }else if(invMerchant[2] > reqMat &&  arrArtisan[6] > (popAmount(arrArtisan[1])*10)) {
+            arrArtisan[5] -= 0
+            arrArtisan[4] += Math.floor(total / 2)
         }
     }else {
         arrArtisan[5] -= reqMat
