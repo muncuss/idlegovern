@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Judul halaman</title>
+    <script type="text/javascript" src="economy.js"></script>
+    <script type="text/javascript" src="warfare.js"></script>
     <script type="text/javascript" src="civilian.js"></script>
+    <script type="text/javascript" src="lord.js"></script>
     <script type="text/javascript" src="main.js"></script>
 </head>
 <body id="body" onload="run()">
     
     
-    <section>
+    <section id="data">
     <!-- VARIABLE -->
     <p>Date: <span id="date"></span></p>
     <p>Population: <span id="pop"></span></p>
@@ -22,7 +25,7 @@
     <br/>
     
     
-    <section>
+    <section id="tab">
     <!-- TAB -->
     <input type="button" value="Economy" onclick="switchTab('economy')">
     <input type="button" value="Troop" onclick="switchTab('troop')">
@@ -107,7 +110,7 @@
     <br/>
     
     
-    <section>
+    <section id="notif">
     <!-- NOTIFICATION -->
         <p><span id="notiff"></span></p>
     </section>
