@@ -1,0 +1,15 @@
+(7/5)
+- change coin amount of civilian & lord
+- add goods requirement every harvest
+(8/5)
+- added lost condition
+- create warfare.js
+- create lord.js
+- create economy.js
+- create dynamic pricing function
+- modify supply demand function
+(9/5)
+- modify dynamic pricing
+- added debt limit
+(12/5)
+- restructuring html
